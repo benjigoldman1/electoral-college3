@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Road to 33: An Electoral College Game</title>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef2f7;--card:#fff;--ink:#16223a;--mute:#56627a;--line:#cfd8e6;--you:#0b8a8c;--you2:#bfe9e8;--you1:#e0f4f3;--opp:#7a45b8;--opp2:#dccbf1;--opp1:#efe6f8;--tie:#f1f3f6;--gold:#d99a10;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1626;--card:#19223a;--ink:#e8edf7;--mute:#9aa7c2;--line:#2e3a58;--you:#4fd1d3;--you2:#17575a;--you1:#12373a;--opp:#b98ef0;--opp2:#4a2f72;--opp1:#2f2250;--tie:#1f2842;--gold:#f0b73a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1626;--card:#19223a;--ink:#e8edf7;--mute:#9aa7c2;--line:#2e3a58;--you:#4fd1d3;--you2:#17575a;--you1:#12373a;--opp:#b98ef0;--opp2:#4a2f72;--opp1:#2f2250;--tie:#1f2842;--gold:#f0b73a;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 "Atkinson Hyperlegible",system-ui,sans-serif}
+h1,h2,h3{font-family:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif;line-height:1.15;margin:0 0 .5em}
+h1{font-size:clamp(2rem,6vw,3.2rem);font-weight:800}h2{font-size:1.5rem;font-weight:800}h3{font-size:1.1rem;font-weight:600}
+main{max-width:920px;margin:0 auto;padding:18px 16px 40px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+button{font:inherit;cursor:pointer;border-radius:10px;border:2px solid var(--ink);background:var(--card);color:var(--ink);padding:10px 16px;font-weight:700}
+button:hover:not(:disabled){background:var(--ink);color:var(--bg)}button:disabled{opacity:.45;cursor:not-allowed}
+button.go{background:var(--you);border-color:var(--you);color:#fff}button.go:hover:not(:disabled){background:var(--ink);border-color:var(--ink)}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.hero{border-left:10px solid var(--you);padding-left:16px;margin:10px 0 18px}
+.hero p{max-width:60ch;color:var(--mute);margin:0}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:14px 0}
+.steps div{background:var(--tie);border-radius:10px;padding:12px;border:1px solid var(--line)}
+.steps b{display:block;font-family:"Bricolage Grotesque",sans-serif}
+.bar{position:relative;height:26px;border-radius:13px;background:var(--opp);overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;background:var(--you);transition:width .5s}
+.bar u{position:absolute;top:0;bottom:0;width:3px;background:var(--gold)}
+.row{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-weight:700;margin-bottom:4px}
+.y{color:var(--you)}.o{color:var(--opp)}
+.hud{display:flex;gap:14px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.pill{background:var(--tie);border:1px solid var(--line);border-radius:99px;padding:4px 12px;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.tile{text-align:left;padding:10px;border-width:2px;border-color:var(--line);display:block;width:100%}
+.tile.sel{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold)}
+.tile b{font-family:"Bricolage Grotesque",sans-serif;font-size:1.05rem}
+.tile small{display:block;color:var(--mute);font-weight:400}
+.tile:hover:not(:disabled){background:inherit;color:inherit;border-color:var(--ink)}
+.ly2{background:var(--you2)}.ly1{background:var(--you1)}.lt{background:var(--tie)}.lr1{background:var(--opp1)}.lr2{background:var(--opp2)}
+.ev{float:right;background:var(--ink);color:var(--bg);border-radius:8px;padding:0 8px;font-weight:700}
+.acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.acts button{flex:1 1 210px;text-align:left}.acts small{display:block;font-weight:400;color:var(--mute)}button:hover:not(:disabled) small{color:inherit}.cost{float:right;color:var(--gold)}.acts button:hover:not(:disabled) .cost{color:inherit}.log{font-size:.95rem;color:var(--mute);margin:8px 0 0;padding-left:18px}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:.9rem;margin:8px 0 0}
+.legend span{padding:2px 10px;border-radius:99px;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+td,th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
+td.n,th.n{text-align:right}
+.win{padding:16px;border-radius:12px;font-family:"Bricolage Grotesque",sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:12px;background:var(--tie);border:3px solid var(--gold)}
+.q{margin:14px 0}.q button{display:block;width:100%;text-align:left;margin:6px 0}
+.q .ok{background:var(--you1);border-color:var(--you)}.q .bad{background:var(--opp1);border-color:var(--opp)}
+.q p{margin:6px 0;color:var(--mute)}
+.hide{display:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script>
+const BASE=[
+["Northport",18,47],["Sunvale",14,52],["Riverton",10,46],["Pinecrest",8,50],["Redrock",6,40],["Lakeside",5,54],
+["Ironwood",4,57],["Bayou",4,43],["Aspen",3,48],["Highmesa",2,38],["Cedar",2,60],["Frostline",1,49]];
+const WEEKS=6,PER=3;let G;
+const $=s=>document.querySelector(s),app=$('#app');
+const rnd=(a,b)=>a+Math.random()*(b-a),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function newGame(){
+ const st=BASE.map(([name,pop,sup])=>{const seats=Math.max(1,Math.round(pop/2));return{name,pop,seats,ev:seats+2,sup,err:rnd(-2.5,2.5),vis:0,org:0,shield:false,gotv:false}});
+ G={st,week:1,left:PER,sel:null,log:[],funds:12,trust:50,tally:{},ev:null,evq:[0,1,2,3,4].sort(()=>Math.random()-.5),total:st.reduce((a,s)=>a+s.ev,0)};G.need=Math.floor(G.total/2)+1;
+}
+const poll=s=>clamp(s.sup+s.err,15,85);
+const cls=p=>p>=58?'ly2':p>=52?'ly1':p>48?'lt':p>42?'lr1':'lr2';
+const lean=p=>p>=58?'Strong lean: You':p>=52?'Leans You':p>48?'Toss-up':p>42?'Leans Rival':'Strong lean: Rival';
+function intro(){
+ newGame();
+ app.innerHTML=`<div class="hero"><h1>Road to ${G.need}</h1><p>Run for president of the fictional country of Civica. You will not win by getting the most votes alone. You must win <i>states</i>.</p></div>
+ <div class="card"><h2>How the Electoral College works</h2>
+ <div class="steps">
+ <div><b>1. Voters pick, states count</b>People vote in their own state. The popular vote in each state decides who wins that state.</div>
+ <div><b>2. Every state has electors</b>A state's electoral votes = its seats in the House + 2 for its Senators. Bigger states get more, but small states get a boost.</div>
+ <div><b>3. Winner takes all</b>In almost every state, the candidate with the most votes gets <i>all</i> of that state's electoral votes, even by 1 vote.</div>
+ <div><b>4. Majority wins</b>In the real U.S. there are 538 electoral votes and a candidate needs 270. In Civica there are ${G.total}, so you need ${G.need}.</div></div>
+ <p><b>Your job:</b> You have ${WEEKS} weeks, ${PER} actions each week, and $12M. Every action has a cost and a trade-off: ads cost more in big states, rallies lose punch when repeated, attack ads hurt your <b>trust rating</b>, and breaking news will force tough choices. Your Rival is campaigning too, and polls can be off by a few points.</p>
+ <button class="go" id="start">Start the campaign</button></div>`;
+ $('#start').onclick=play;
+}
+function evCount(){let y=0,o=0;G.st.forEach(s=>poll(s)>50?y+=s.ev:o+=s.ev);return[y,o]}
+function meter(y,o,lab){const t=G.total;return`<div class="row"><span class="y">You ${y}</span><span>${lab} (majority: ${G.need})</span><span class="o">Rival ${o}</span></div><div class="bar" role="img" aria-label="You ${y} electoral votes, Rival ${o}"><i style="width:${y/t*100}%"></i><u style="left:${G.need/t*100}%"></u></div>`}
+const tr=d=>{G.trust=clamp(G.trust+d,0,100)},fix=()=>{G.funds=Math.max(0,Math.round(G.funds))};
+const adC=s=>1+Math.ceil(s.pop/8),rg=s=>[5,3.5,2,1][Math.min(s.vis,3)];
+const ACTS=[
+{id:'rally',st:1,l:'Hold a rally',cost:()=>1,d:s=>s?`About +${rg(s)} pts here. Weaker every repeat visit.`:'About +5 pts, weaker on repeat visits.',run:s=>{const g=rg(s)+rnd(-1,1);s.sup=clamp(s.sup+g,10,90);s.vis++;return`Rally in ${s.name}: +${g.toFixed(1)}.`}},
+{id:'ads',st:1,l:'Run TV ads',cost:s=>adC(s),d:()=>'+3 pts. Costs more in big states.',run:s=>{const g=3+rnd(-1,1);s.sup=clamp(s.sup+g,10,90);return`TV ads in ${s.name}: +${g.toFixed(1)}.`}},
+{id:'org',st:1,l:'Hire local organizers',cost:()=>1,d:()=>'+1 pt now, then +1 every week. Stacks to 3.',run:s=>{s.org=Math.min(3,s.org+1);s.sup+=1;return`Organizers in ${s.name} (level ${s.org}): +1 now and every week.`}},
+{id:'gotv',st:1,l:'Get out the vote',cost:()=>2,d:()=>'+1 pt. Cuts Election Day surprises in half here.',run:s=>{s.gotv=true;s.sup+=1;return`Turnout drive in ${s.name}: +1, and a more predictable result.`}},
+{id:'attack',st:1,l:'Attack ad on the Rival',cost:()=>2,d:()=>'+4 pts here, but trust drops by 8.',run:s=>{const g=4+rnd(-1,1);s.sup=clamp(s.sup+g,10,90);tr(-8);return`Attack ad in ${s.name}: +${g.toFixed(1)}, trust -8.`}},
+{id:'defend',st:1,l:'Defend this state',cost:()=>1,d:()=>"Blocks most of the Rival's next attack here.",run:s=>{s.shield=true;return`You protected ${s.name} from the Rival's next visit.`}},
+{id:'donors',l:'Big-donor dinner',cost:()=>-8,d:()=>'Gain $8M, but trust drops by 6.',run:()=>{G.funds+=8;tr(-6);return'Donor dinner: +$8M, trust -6.'}},
+{id:'small',l:'Small-donor drive',cost:()=>-4,d:()=>'Gain $4M and trust rises by 2.',run:()=>{G.funds+=4;tr(2);return'Small-donor drive: +$4M, trust +2.'}},
+{id:'town',l:'National town hall',cost:()=>1,d:()=>'Trust rises by 8.',run:()=>{tr(8);return'Town hall: trust +8.'}}];
+const rs=()=>G.st[Math.floor(Math.random()*G.st.length)],all=d=>G.st.forEach(s=>s.sup=clamp(s.sup+d,10,90));
+const EVS=[
+()=>{const s=rs();return{t:'Endorsement offer',x:`A popular local leader in ${s.name} will endorse you, but wants you to back a pet project that some voters dislike.`,c:[['Accept','Gain votes in one state, but it may cost trust.',()=>{s.sup+=4;tr(-5);return`Endorsement: +4 in ${s.name}, trust -5.`}],['Decline politely','Keep your reputation clean.',()=>{tr(3);return'You declined and looked principled: trust +3.'}]]}},
+()=>({t:'Staff scandal',x:'Old posts by a campaign staffer go viral. Reporters want answers.',c:[['Apologize and fire the staffer','Costs money for damage control.',()=>{G.funds-=1;tr(-2);return'You apologized: -$1M, trust -2.'}],['Defend your team','Supporters donate, but many voters are upset.',()=>{G.funds+=3;tr(-10);return'You defended the staffer: +$3M, trust -10.'}]]}),
+()=>{const s=rs();return{t:'Disaster strikes',x:`A hurricane hits ${s.name}, where you had a rally scheduled.`,c:[['Pause and help','Costs one action this week; voters notice.',()=>{G.left=Math.max(0,G.left-1);tr(6);return'You paused to help: lose 1 action, trust +6.'}],['Keep campaigning','Stay on schedule.',()=>{s.sup-=3;tr(-4);return`You kept campaigning: -3 in ${s.name}, trust -4.`}]]}},
+()=>({t:'Debate night',x:'Millions are watching your first debate.',c:[['Play it safe','Small, reliable gain.',()=>{all(1);tr(2);return'Steady debate: +1 everywhere, trust +2.'}],['Go on offense','Risky: could go very well or very badly.',()=>{if(Math.random()<.5){all(2.5);tr(4);return'Your attacks landed: +2.5 everywhere, trust +4.'}all(-2);tr(-6);return'It backfired: -2 everywhere, trust -6.'}]]}),
+()=>{const s=rs();return{t:'Factory closing',x:`A big factory in ${s.name} is closing. Voters want a plan.`,c:[['Promise a jobs plan','Gain votes in one state; the plan costs money.',()=>{G.funds-=2;s.sup+=5;return`Jobs plan: -$2M, +5 in ${s.name}.`}],['Stay on message','Save your money.',()=>{tr(1);return'You stayed focused: trust +1.'}]]}}];
+const EVW={2:0,3:1,5:2};
+function evScreen(){
+ const e=G.ev;
+ app.innerHTML=`<div class="card" style="border:3px solid var(--gold)"><h2>Breaking news: ${e.t}</h2><p>${e.x}</p><div class="acts">${e.c.map((c,i)=>`<button data-c="${i}"><b>${c[0]}</b><small>${c[1]}</small></button>`).join('')}</div></div>`;
+ document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{const m=e.c[+b.dataset.c][2]();G.ev=null;fix();G.log.push('<b>News:</b> '+m);play()});
+}
+function play(){
+ if(G.ev)return evScreen();
+ const [y,o]=evCount(),sel=G.sel!=null?G.st[G.sel]:null,sh=(G.trust-50)*.1;
+ const btn=a=>{const c=a.st?a.cost(sel||{pop:8}):a.cost(),dis=G.left<1||G.funds<c||(a.st&&!sel);return`<button data-a="${a.id}" ${dis?'disabled':''}><b>${a.l}</b> <span class="cost">${c<0?'+$'+(-c):'$'+c}M</span><small>${a.d(sel)}</small></button>`};
+ const tags=s=>[s.org?'Organizers: '+s.org:'',s.shield?'Defended':'',s.gotv?'Turnout drive':''].filter(Boolean).join(' · ');
+ app.innerHTML=`<div class="card"><div class="hud"><h2 style="margin:0">Week ${G.week} of ${WEEKS}</h2><span class="pill">Actions left: ${G.left}</span><span class="pill">Funds: $${G.funds}M</span><span class="pill" title="Trust shifts every state on Election Day">Trust: ${G.trust} (${sh>=0?'+':''}${sh.toFixed(1)} pts everywhere on Election Day)</span></div>
+ <p style="margin:10px 0 12px;color:var(--mute)">If the election were held today based on the polls:</p>${meter(y,o,'Polls say')}</div>
+ <div class="card"><h3>1. Choose a state</h3><div class="grid">${G.st.map((s,i)=>{const p=poll(s);return`<button class="tile ${cls(p)} ${G.sel===i?'sel':''}" data-i="${i}"><span class="ev">${s.ev} EV</span><b>${s.name}</b><small>${s.pop}M people</small><small>Poll: ${p.toFixed(0)}% you · ${lean(p)}</small><small>${tags(s)}</small></button>`}).join('')}</div>
+ <div class="legend"><span class="ly2">Strong You</span><span class="ly1">Leans You</span><span class="lt">Toss-up</span><span class="lr1">Leans Rival</span><span class="lr2">Strong Rival</span></div></div>
+ <div class="card"><h3>2. ${sel?'Actions in '+sel.name+' ('+sel.ev+' EV = '+sel.seats+' House seats + 2 Senators)':'Pick a state above to unlock state actions'}</h3><div class="acts">${ACTS.filter(a=>a.st).map(btn).join('')}</div>
+ <h3 style="margin-top:16px">Campaign-wide actions</h3><div class="acts">${ACTS.filter(a=>!a.st).map(btn).join('')}</div>
+ ${G.log.length?`<ul class="log">${G.log.slice(-5).map(l=>`<li>${l}</li>`).join('')}</ul>`:''}</div>
+ <button class="go" id="next">${G.week==WEEKS?'Go to Election Day':'End week '+G.week+(G.left?' early':'')}</button>`;
+ document.querySelectorAll('.tile').forEach(b=>b.onclick=()=>{G.sel=+b.dataset.i;play()});
+ document.querySelectorAll('.acts button').forEach(b=>b.onclick=()=>{
+  const a=ACTS.find(x=>x.id===b.dataset.a),c=a.st?a.cost(sel):a.cost();
+  G.funds-=c;G.left--;G.tally[a.id]=(G.tally[a.id]||0)+1;G.log.push(a.run(sel));fix();play()});
+ $('#next').onclick=endWeek;
+}
+function endWeek(){
+ G.st.forEach(s=>{if(s.org)s.sup=clamp(s.sup+s.org,10,90)});
+ if(G.st.some(s=>s.org))G.log.push('Your organizers added support in their states.');
+ const c=G.st.map(s=>({s,w:s.ev*(1-Math.abs(s.sup-50)/25)+rnd(0,2)})).sort((a,b)=>b.w-a.w).slice(0,2);
+ c.forEach(({s})=>{const d=s.shield?rnd(.5,1):rnd(2,4);s.sup=clamp(s.sup-d,10,90);G.log.push(s.shield?`The Rival went to ${s.name}, but your defenses held: only -${d.toFixed(1)}.`:`The Rival campaigned in ${s.name}: you lost ${d.toFixed(1)} points.`)});
+ G.st.forEach(s=>s.shield=false);
+ G.week++;G.left=PER;
+ if(G.week>WEEKS)return election();
+ if(EVW[G.week]!==undefined)G.ev=EVS[G.evq[EVW[G.week]]]();
+ play();
+}
+function decide(){
+ const L={rally:'rallies',ads:'ad buys',org:'organizer hires',gotv:'turnout drives',attack:'attack ads',defend:'defenses',donors:'donor dinners',small:'small-donor drives',town:'town halls'};
+ const t=Object.entries(G.tally).map(([k,v])=>`${v} ${L[k]}`).join(', ')||'none',sh=(G.trust-50)*.1;
+ return`<div class="card"><h3>Your decisions</h3><ul><li>You took: ${t}.</li><li>Your trust rating of ${G.trust} moved every state by <b>${sh>=0?'+':''}${sh.toFixed(1)}</b> points. Attack ads and big-donor money lower trust. Town halls and small donors raise it.</li><li>${G.funds>=3?`You ended with $${G.funds}M unspent. Money in the bank doesn't win votes.`:`You spent nearly all your funds ($${G.funds}M left).`}</li>${G.st.some(s=>s.gotv)?'<li>Your turnout drives made results in those states more predictable.</li>':''}</ul></div>`}
+function election(){
+ G.res=G.st.map(s=>{const a=clamp(s.sup+(G.trust-50)*.1+(rnd(-3,3)+rnd(-1,1))*(s.gotv?.5:1),5,95);return{s,a,w:a>50}});
+ let y=0,o=0;G.res.forEach(r=>r.w?y+=r.s.ev:o+=r.s.ev);
+ let py=0,pt=0;G.res.forEach(r=>{py+=r.s.pop*r.a;pt+=r.s.pop*100});
+ G.ey=y;G.eo=o;G.pv=py/pt*100;G.shown=0;
+ app.innerHTML=`<div class="card"><h2>Election Day</h2><p>The votes are counted state by state. Watch the electoral vote total grow.</p><div id="m"></div><table><thead><tr><th>State</th><th class="n">EV</th><th class="n">Your vote</th><th>Winner</th></tr></thead><tbody id="tb"></tbody></table><div class="acts"><button id="skip">Skip to results</button></div></div><div id="out"></div>`;
+ G.timer=setInterval(reveal,650);reveal();$('#skip').onclick=()=>{while(G.shown<G.res.length)reveal()};
+}
+function reveal(){
+ if(G.shown>=G.res.length){clearInterval(G.timer);return}
+ const r=G.res[G.shown++];
+ $('#tb').insertAdjacentHTML('beforeend',`<tr><td>${r.s.name}</td><td class="n">${r.s.ev}</td><td class="n">${r.a.toFixed(1)}%</td><td class="${r.w?'y':'o'}"><b>${r.w?'You':'Rival'}</b> gets all ${r.s.ev}</td></tr>`);
+ let y=0,o=0;G.res.slice(0,G.shown).forEach(x=>x.w?y+=x.s.ev:o+=x.s.ev);
+ $('#m').innerHTML=meter(y,o,'Electoral votes counted');
+ if(G.shown==G.res.length){clearInterval(G.timer);setTimeout(results,500)}
+}
+function results(){
+ const youWin=G.ey>=G.need,pvWin=G.pv>50,tot=G.total;
+ const marg=G.res.filter(r=>r.w).sort((a,b)=>a.a-b.a)[0];
+ const lost=G.res.filter(r=>!r.w&&r.a>=45).sort((a,b)=>b.a-a.a)[0];
+ let lesson;
+ if(youWin!==pvWin)lesson=`<b>A split result!</b> You got ${G.pv.toFixed(1)}% of all votes but ${youWin?'won':'lost'} the Electoral College. This happens in real life too (it has happened five times in U.S. history). It happens because votes are counted <i>inside states</i>, and winning a state by 1 vote earns the same as winning it by 1 million.`;
+ else lesson=`Your share of the popular vote was <b>${G.pv.toFixed(1)}%</b>, but your share of electoral votes was <b>${(G.ey/tot*100).toFixed(1)}%</b>. Winner-take-all tends to turn a small lead in votes into a bigger lead in electoral votes.`;
+ const extra=(marg?`<li>Your closest win was <b>${marg.s.name}</b> (${marg.a.toFixed(1)}%). You got all ${marg.s.ev} electoral votes for that narrow win.</li>`:'')+(lost?`<li>You lost <b>${lost.s.name}</b> with ${lost.a.toFixed(1)}% of the vote and got <b>0</b> of its ${lost.s.ev} electoral votes. Those voters had no effect on the electoral count.</li>`:'');
+ const dec=decide();$('#out').innerHTML=`<div class="win">${youWin?'You win the presidency!':'The Rival wins the presidency.'} ${G.ey} to ${G.eo} (needed ${G.need})</div>
+ <div class="card"><h3>What happened</h3><p>${lesson}</p><ul>${extra}</ul>
+ <div class="row" style="margin-top:12px"><span>Popular vote: <b class="y">You ${G.pv.toFixed(1)}%</b></span><span><b class="o">Rival ${(100-G.pv).toFixed(1)}%</b></span></div></div>
+ ${dec}<div class="card" id="qz"></div>
+ <button class="go" id="again">Play again</button>`;
+ $('#again').onclick=intro;quiz();
+ $('#out').scrollIntoView({behavior:'smooth'});
+}
+const QS=[
+["How many electoral votes does a state get?",["The same number for every state","Its number of House seats + 2 Senators","Only its population"],1,"A state's electors equal its Representatives plus its two Senators."],
+["In most states, what happens when a candidate wins the state by just 1 vote?",["They get all the state's electoral votes","They get half","They get none"],0,"This is winner-take-all. Maine and Nebraska are exceptions that split some of their votes."],
+["Can a candidate win the most votes nationwide and still lose the election?",["No, never","Yes, if they lose the electoral vote","Only if there is a tie"],1,"Yes. Electoral votes decide the winner, and this has happened in U.S. history."],
+["Why do campaigns spend the most time in toss-up states?",["Those states are prettier","A small swing can flip all of that state's electoral votes","Safe states don't count"],1,"Flipping a close state moves all of its electoral votes at once."]];
+function quiz(){
+ let sc=0,n=0;const el=$('#qz');
+ el.innerHTML='<h3>Check your understanding</h3>'+QS.map((q,i)=>`<div class="q"><b>${q[0]}</b>${q[1].map((o,j)=>`<button data-q="${i}" data-a="${j}">${o}</button>`).join('')}<p class="hide" id="f${i}"></p></div>`).join('')+'<div id="sc"></div>';
+ el.querySelectorAll('.q button').forEach(b=>b.onclick=()=>{
+  const i=+b.dataset.q,a=+b.dataset.a,q=QS[i],bs=el.querySelectorAll(`[data-q="${i}"]`);
+  if(bs[0].disabled)return;bs.forEach(x=>x.disabled=true);
+  const ok=a===q[2];b.classList.add(ok?'ok':'bad');bs[q[2]].classList.add('ok');if(ok)sc++;n++;
+  const f=$('#f'+i);f.textContent=(ok?'Correct. ':'Not quite. ')+q[3];f.classList.remove('hide');
+  if(n==QS.length)$('#sc').innerHTML=`<p><b>Score: ${sc} of ${QS.length}</b></p>`;
+ });
+}
+intro();
+</script>
+</body>
+</html>
